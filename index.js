@@ -15,8 +15,8 @@ const randomName = () => {
     ].join(` `);
 }
 
-const sluggIsh = (name) => {
-    return name.toLowerCase().replace(/\s/g, '-') + `.yaml`;
+const sluggIsh = (name, folder) => {
+    return `${folder || ''}/` + name.toLowerCase().replace(/\s/g, '-') + `.yaml`;
 }
 
 const write = async (file, contents) => {
@@ -24,7 +24,7 @@ const write = async (file, contents) => {
     await fs.promises.writeFile(file, contents);
 }
 
-const generateDataFiles = async (count, dir) => {
+const generateDataFiles = async (count, dir, folders) => {
     if (!/^\.\/example.+\/.+/.test(dir)) return;
     clean(dir);
 
@@ -32,7 +32,8 @@ const generateDataFiles = async (count, dir) => {
 
     for (let i = 0; i < count; i++) {
         const name = randomName();
-        const file = path.join(dir, sluggIsh(name));
+        const folder = folders ? folders[Math.floor(Math.random() * folders.length)]: null;
+        const file = path.join(dir, sluggIsh(name, folder));
 
         writingFiles.push(write(file, `title: ${name}\nprice: ${(Math.random() * 100).toFixed(2)}`));
     }
@@ -62,6 +63,7 @@ const generateDataFile = async (count, dir) => {
 
 generateDataFiles(100, './example-100-data-files/_data');
 generateDataFiles(1000, './example-1000-data-files/_data');
+generateDataFiles(1000, './example-1000-data-files-in-folders/_data', ['one', 'two', 'three']);
 
 generateDataFile(100, './example-100-data-file/_data');
 generateDataFile(1000, './example-1000-data-file/_data');
